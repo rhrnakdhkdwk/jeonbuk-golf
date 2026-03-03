@@ -104,10 +104,21 @@ export default function App() {
     }
     setSubmitStatus('submitting');
     try {
+      // 1. Save to local DB
       await fetch('/api/consultations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(consultation)
+      });
+
+      // 2. Send to Formspree
+      await fetch('https://formspree.io/f/xojnozeg', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...consultation,
+          _subject: `[전북골프경기지원센터] 새로운 상담 신청: ${consultation.name}`
+        })
       });
       
       // SMS Trigger logic (opens SMS app on mobile)
@@ -148,7 +159,6 @@ export default function App() {
             <a href="#consult" className="px-5 py-2.5 bg-golf-green text-white rounded-full hover:bg-golf-green/90 transition-all shadow-lg shadow-golf-green/20">
               상담신청
             </a>
-            <button onClick={() => setShowAdmin(!showAdmin)} className="text-xs opacity-50 hover:opacity-100">관리자</button>
           </nav>
 
           <button className="md:hidden text-golf-green" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -579,6 +589,7 @@ export default function App() {
             <div>
               <h5 className="font-bold mb-6">Contact</h5>
               <ul className="space-y-4 text-slate-400 text-sm">
+                <li className="font-bold text-white">대표 김지원</li>
                 <li className="flex flex-col gap-1">
                   <div className="flex items-center gap-2"><Phone size={14} /> 010-7472-0742</div>
                   <div className="flex items-center gap-2 ml-5">010-8797-0742</div>
